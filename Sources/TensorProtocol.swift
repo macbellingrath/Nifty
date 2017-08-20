@@ -70,17 +70,6 @@ public protocol TensorProtocol: CustomStringConvertible
     ///        given a name, otherwise to false
     init(_ tensorP: Self, name: String?, showName: Bool?)
     
-    /// Initialize a new tensor from a comma separated string.
-    ///
-    /// The given csv string must be in the format returned by Tensor.csv.
-    ///
-    /// - Parameters:
-    ///    - csv: comma separated string containing tensor data
-    ///    - name: optional name of new tensor
-    ///    - showName: determine whether to print the tensor name; defaults to true if the tensor is
-    ///        given a name, otherwise to false
-    init(_ csv: String, name: String?, showName: Bool?)
-    
     /// Access a single element of the tensor with a subscript.
     ///
     /// If only one subscript is given, it is interpretted as a row-major order linear index. 
@@ -94,14 +83,6 @@ public protocol TensorProtocol: CustomStringConvertible
     subscript(_ s: Int...) -> Element { get set }
     
     subscript(_ s: SliceIndex...) -> Self { get set }
-
-    /// Return tensor representation in unformatted, comma separated list.
-    ///
-    /// Elements of a row are comma separated. Rows are separated by newlines. Higher dimensional 
-    /// slices are separated by a line consisting entirely of semicolons, where the number of
-    /// semicolons indicates the dimension that ended; e.g. ";" comes between matrices in a 3D 
-    /// tensor, ";;" comes between 3D tensors in a 4D tensor, ";;;" between 4D tensors in 5D, etc.
-    var csv: String { get }
 }
 
 
@@ -179,21 +160,6 @@ extension TensorProtocol {
         // need to create new formatter instance, copying values
         self.format = _copyNumberFormatter(tensor.format)
     }    
-
-    /// Initialize a new tensor from a comma separated string.
-    ///
-    /// The given csv string must be in the format returned by Tensor.csv.
-    ///
-    /// - Parameters:
-    ///    - csv: comma separated string containing tensor data
-    ///    - name: optional name of new tensor
-    ///    - showName: determine whether to print the tensor name; defaults to true if the tensor is
-    ///        given a name, otherwise to false
-    public init(_ csv: String, name: String? = nil, showName: Bool? = nil)
-    {
-        // FIXME: implement
-        fatalError("Not yet implemented")
-    }
 
     /// Access a single element of the tensor with a subscript.
     ///
@@ -324,14 +290,4 @@ extension TensorProtocol {
         fatalError("Not yet implemented")
     }    
 
-    /// Return tensor representation in unformatted, comma separated list.
-    ///
-    /// Elements of a row are comma separated. Rows are separated by newlines. Higher dimensional 
-    /// slices are separated by a line consisting entirely of semicolons, where the number of
-    /// semicolons indicates the dimension that ended; e.g. ";" comes between matrices in a 3D 
-    /// tensor, ";;" comes between 3D tensors in a 4D tensor, ";;;" between 4D tensors in 5D, etc.
-    public var csv: String
-    {  
-        fatalError("Not yet implemented")
-    }
 }
