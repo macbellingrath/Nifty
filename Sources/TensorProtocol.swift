@@ -28,6 +28,26 @@ public protocol TensorProtocol: CustomStringConvertible
 {   
     // TODO for Swift 4, replace the associatedtype line with this one.
     // associatedtype Element : Numeric
+    /*  (Explanation:)
+    
+        This will allow for any field of numbers that has a 
+        'multiplication' operation and a 'addition' operation,
+        to be used as the _associatedtype Element_.
+        
+        Such a field doesn't need to be dense (it can be made of Ints),
+        and it doesn't (I think) need to be Signed. Although I can't
+        think atm of a use for UInts in Tensors, there's probably a good
+        use case there somewhere.
+
+        Examples of fields supported by this type restriction:
+        - Float, Double, Decimal, etc
+        - Int, UInt and everything next to them
+        - Complex numbers (if implemented, they SHOULD be made to
+          conform to Numeric).
+        - Quaternions (if you're making Tensors contain Quaternions,
+          I love you and I think you are crazy. Be our guest)
+        - Etc :)
+    */
     associatedtype Element    
 
     /// Number of elements in the tensor.
