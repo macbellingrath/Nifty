@@ -475,10 +475,34 @@ public struct MatrixX<T>: TensorProtocol
 {    
     public typealias Element = T
 
-    public var _size : [Int]
+    public var size : [Int]
+    {
+        didSet
+        {
+            if(oldValue.reduce(1, *) != self.count)
+            {
+                print("Error: invalid reshape (changes count)")
+                self.size = oldValue
+            }    
+            if(oldValue.count != 2)
+            {
+                print("Error: invalid reshape (no longer a matrix)")
+                self.size = oldValue
+            }
+        }
+    }
 
-    public var _data : [T]
-
+    public var data : [T]
+    {
+        didSet
+        {
+            if(oldValue.count != self.count)
+            {
+                print("Error: invalid data (different count)")
+                self.data = oldValue
+            }    
+        }
+    }
     /// Optional name of matrix (e.g., for use in display).
     public var name: String?
 
@@ -508,8 +532,8 @@ public struct MatrixX<T>: TensorProtocol
         let count = rows * columns     
         precondition(data.count == count, "Matrix dimensions must match data")
 
-        self._size = [rows, columns]
-        self._data = data    
+        self.size = [rows, columns]
+        self.data = data    
         self.name = name    
 
         if let show = showName

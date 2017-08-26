@@ -519,15 +519,33 @@ public struct Tensor<T>: CustomStringConvertible
     }
 }
 
-
-
 public struct TensorX<T>: TensorProtocol
 {
     public typealias Element = T
 
-    public var _size : [Int]
+    public var size : [Int]
+    {
+        didSet
+        {
+            if(oldValue.reduce(1, *) != self.count)
+            {
+                print("Error: invalid reshape (changes count)")
+                self.size = oldValue
+            }    
+        }
+    }
 
-    public var _data : [T]
+    public var data : [T]
+    {
+        didSet
+        {
+            if(oldValue.count != self.count)
+            {
+                print("Error: invalid data (different count)")
+                self.data = oldValue
+            }    
+        }
+    }
 
     /// Optional name of tensor (e.g., for use in display).
     public var name: String?
@@ -554,8 +572,8 @@ public struct TensorX<T>: TensorProtocol
         precondition((size.filter({$0 <= 0})).count == 0, "Tensor must have all dimensions > 0")
         precondition(data.count == n, "Tensor dimensions must match data")
 
-        self._size = size
-        self._data = data    
+        self.size = size
+        self.data = data    
         self.name = name    
         
         if let show = showName
@@ -811,25 +829,23 @@ public struct TensorX<T>: TensorProtocol
             title = ""
             // FIXME: this should be uncommented after 
             // refactoring Vector and Matrix
-            //title = (self.name ?? "\(self.size.map({"\($0)"}).joined(separator: "x")) tensor") + ":\n"
+            title = (self.name ?? "\(self.size.map({"\($0)"}).joined(separator: "x")) tensor") + ":\n"
         }
 
         // handle 1D tensor
         if self.size.count == 1
         {
-            return ""
             // FIXME: this should be uncommented after 
             // refactoring Vector and Matrix
-            // return "\(Vector(self, name: title, showName: self.showName))"
+            return "\(VectorX(self, name: title, showName: self.showName))"
         }
 
         // handle 2D tensor
         else if self.size.count == 2
         {
-            return ""
             // FIXME: this should be uncommented after 
             // refactoring Vector and Matrix
-            // return "\(Matrix(self, name: title, showName: self.showName))"                
+            return "\(MatrixX(self, name: title, showName: self.showName))"                
         }
 
         // break 3D+ tensors into 2D tensor chunks

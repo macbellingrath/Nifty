@@ -26,97 +26,44 @@ import Foundation
 /// Data structure for an N-D, row-major order array.
 public protocol TensorProtocol: CustomStringConvertible
 {   
-    // TODO for Swift 4, replace the associatedtype line with this one.
-    // associatedtype Element : Numeric
-    /*  (Explanation:)
-    
-        This will allow for any field of numbers that has a 
-        'multiplication' operation and a 'addition' operation,
-        to be used as the _associatedtype Element_.
-        
-        Such a field doesn't need to be dense (it can be made of Ints),
-        and it doesn't (I think) need to be Signed. Although I can't
-        think atm of a use for UInts in Tensors, there's probably a good
-        use case there somewhere.
-
-        Examples of fields supported by this type restriction:
-        - Float, Double, Decimal, etc
-        - Int, UInt and everything next to them
-        - Complex numbers (if implemented, they SHOULD be made to
-          conform to Numeric).
-        - Quaternions (if you're making Tensors contain Quaternions,
-          I love you and I think you are crazy. Be our guest)
-        - Etc :)
-    */
     associatedtype Element    
 
     /// Number of elements in the tensor.
     var count: Int { get }
 
-    /// Internal property. Set at your own risk
-    var _size: [Int] { get set }
     /// Number of elements in each dimension of the tensor.
-    var size:  [Int] { get }
+    var size:  [Int] { get set }
 
-    /// Internal property. Set at your own risk
-    var _data: [Element] { get set }
     /// Data contained in tensor in row-major order.
-    var data:  [Element] { get  }
+    var data:  [Element] { get set }
     
     // TODO: check if these are implementable for every TensorProtocol type
     // Even though they are basic initializers, they might not be general enough.
     // init(_ size: [Int], _ data: [Element], name: String? = nil, showName: Bool? = nil)
     // init(_ size: [Int], value: T, name: String? = nil, showName: Bool? = nil)
     // init(_ size: [Int], value: Element, name: String?, showName: Bool?)
-    
-    // This is a copy initializer. The only truly general initializer, I think.
-    init(_ otherTP: Self, name: String?, showName: Bool?)
+    // init(_ otherTP: Self, name: String?, showName: Bool?)
     
     // TODO for Swift 4, use the new indexing capabilities for the
     // subscripting functions :)
     subscript(_ s: [Int]) -> Element { get set }
     
-    subscript(_ s: Int...) -> Element { get set }
-    
-    // TODO: check if this is implementable for every TensorProtocol type
-    // subscript(_ s: SliceIndex...) -> Self { get set }
+    subscript(_ s: Int...) -> Element { get set }    
 }
 
 
 // Default implementations for the structs that adhere to the TensorProtocol
 public extension TensorProtocol {
 
-    // We compute count on the fly, because it's less redundant this way.
-    var count : Int {
-        return size.reduce(1, *)
-    }
+    public var count : Int 
+    { 
+        return size.reduce(1, *) 
+    }   
 
-    internal(set) var size : [Int] { 
-        get {
-            return _size        
-        }
-        set {
-            _size = newValue
-        }
-    }
-
-    internal(set) var data : [Element] { 
-        get {
-            return _data        
-        }
-        set {
-            _data = newValue
-        }
-    }
-
-    // Subscripting can be implemented well in the extension! 
-    // Horray for DRY code :D
     public subscript(_ s: [Int]) -> Element
     {
         get
         {
-            assert(s.count > 0)
-
             if s.count == 1
             {
                 return self.getValue(index: s[0])
@@ -129,8 +76,6 @@ public extension TensorProtocol {
 
         set(newValue)
         {    
-            assert(s.count > 0)
-
             if s.count == 1
             {
                 self.setValue(index: s[0], value: newValue)
@@ -139,7 +84,6 @@ public extension TensorProtocol {
             {
                 self.setValue(subscripts: s, value: newValue)
             }
-
         }
     }
 
@@ -151,31 +95,23 @@ public extension TensorProtocol {
     
     internal func getValue(index: Int) -> Element
     {
-        // FIXME: replace this precondition by an error
-        precondition(index >= 0 && index < self.count, "TensorProtocol subscript out of bounds")
         return self.data[index]            
     }
 
     internal mutating func setValue(index: Int, value: Element)
     {
-        // FIXME: replace this precondition by an error
-        precondition(index >= 0 && index < self.count, "TensorProtocol subscript out of bounds")
         self.data[index] = value
     }
 
     internal func getValue(subscripts: [Int]) -> Element
     {
         let index = sub2ind(subscripts, size: self.size)
-        // FIXME: replace this precondition by an error
-        precondition(index >= 0, "TensorProtocol subscript out of bounds")
         return self.data[index]
     }
 
     internal mutating func setValue(subscripts: [Int], value: Element)
     {
         let index = sub2ind(subscripts, size: self.size)
-        // FIXME: replace this precondition by an error
-        precondition(index >= 0, "TensorProtocol subscript out of bounds")
         self.data[index] = value
     }   
 }
